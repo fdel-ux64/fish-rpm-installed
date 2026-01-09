@@ -77,6 +77,11 @@ rpm_installed --help
 - The cache can be rebuilt at any time using `--refresh`.
 - Designed to be fast, simple, and predictable.
 
+  
+## Related Projects
+
+- [bash-rpm-installed](https://github.com/fdel-ux64/bash-rpm-installed) - bash shell version
+
 
 ## License
 
