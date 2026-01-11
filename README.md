@@ -10,6 +10,7 @@ It ensures consistent date parsing by using the **US English locale**.
 
 ## Features
 
+- Distro check for RPM-based systems 
 - List installed RPM packages by date range
 - Common time-based shortcuts (today, last-week, etc.)
 - Aggregated statistics (per-day / per-week)
@@ -26,6 +27,16 @@ Using [Fisher](https://github.com/jorgebucaran/fisher):
 fisher install fdel-ux64/fish-rpm-installed
 ```
 
+## Project Structure
+
+```
+├── completions
+│   └── rpm_installed.fish
+├── functions
+│   └── rpm_installed.fish
+├── LICENSE
+└── README.md
+```
 
 ## Usage
 
