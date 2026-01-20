@@ -3,9 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Fish Shell](https://img.shields.io/badge/fish-v3.0+-blue.svg)](https://fishshell.com)
 
-A powerful Fish shell function to **list and analyze RPM packages** by installation date, with intelligent caching for blazing-fast repeated queries.
+A powerful Fish shell function to **list and analyze RPM packages** by installation date, with intelligent caching for blazing-fast repeated queries and beautiful formatted output.
 
-> 🚀 **Ever wondered what packages you installed last week?** Or need to audit recent system changes? This tool makes it effortless.
+> 🚀 **Ever wondered what packages you installed last week?** Or need to audit recent system changes? This tool makes it effortless with a clean, formatted display.
 
 ---
 
@@ -14,6 +14,7 @@ A powerful Fish shell function to **list and analyze RPM packages** by installat
 - **⚡ Lightning Fast** - Cached queries return results instantly
 - **📅 Date-Aware** - Filter packages by any date range or use convenient shortcuts
 - **📊 Analytics** - Built-in aggregation to see installation patterns (per-day/per-week)
+- **🎨 Beautiful Output** - Formatted headers, icons, and package counts
 - **🎯 Simple** - Zero dependencies, pure Fish shell
 - **🔍 Smart** - Auto-detects RPM systems and uses consistent locale parsing
 
@@ -63,6 +64,22 @@ rpm_installed per-day
 
 ---
 
+## 🎨 Example Output
+
+```
+       📦 List of installed package(s): today
+       ╰─────────────────────────────────────────────────────────
+
+1768717505 (Sun 18 Jan 2026 07:25:05 AM CET): pipewire-pulseaudio-1.4.10-1.fc43.x86_64
+1768717505 (Sun 18 Jan 2026 07:25:05 AM CET): pipewire-plugin-libcamera-1.4.10-1.fc43.x86_64
+1768717504 (Sun 18 Jan 2026 07:25:04 AM CET): wireplumber-0.5.7-1.fc43.x86_64
+
+────────────────────────────────────
+🔢 Total number of package(s): 21
+```
+
+---
+
 ## 📖 Usage
 
 ### Basic Syntax
@@ -103,15 +120,15 @@ rpm_installed --help
 
 ## 💡 Examples
 
-### Simple Queries
+### Simple Queries with Formatted Output
 
 ```fish
-# Using shortcuts
+# Using shortcuts - shows header, packages, and count
 rpm_installed td                    # Today's installations
 rpm_installed yd                    # Yesterday's installations
 rpm_installed lw                    # Last week
 
-# With counts
+# With counts (no formatting, just statistics)
 rpm_installed count today           # How many packages today?
 rpm_installed count last-month      # Monthly installation count
 ```
@@ -119,7 +136,7 @@ rpm_installed count last-month      # Monthly installation count
 ### Date Range Queries
 
 ```fish
-# Specific date range
+# Specific date range with formatted output
 rpm_installed since 2025-12-01 until 2025-12-15
 
 # Open-ended (everything since a date)
@@ -129,14 +146,23 @@ rpm_installed since 2025-01-01
 rpm_installed since 2025-12-25 until 2025-12-25
 ```
 
-### Analytics
+### Analytics (Statistics Only)
 
 ```fish
 # Daily installation pattern
 rpm_installed per-day
 
+# Output example:
+# 2025-01-15  5
+# 2025-01-16  12
+# 2025-01-17  3
+
 # Weekly trends
 rpm_installed per-week
+
+# Output example:
+# 2025-W02  18
+# 2025-W03  25
 ```
 
 ### Cache Management
@@ -150,10 +176,28 @@ rpm_installed --refresh
 
 ## 🏗️ How It Works
 
-1. **First Run**: Queries all installed RPM packages with installation dates using `rpm -qa --last`
-2. **Caching**: Stores results in `~/.cache/rpm_installed.cache` for instant subsequent queries
-3. **Locale Handling**: Forces US English locale (`LC_TIME=en_US.UTF-8`) for consistent date parsing across systems
+1. **First Run**: Queries all installed RPM packages with installation dates using `rpm -qa`
+2. **Caching**: Stores results in memory (`__instlist_cache`) for instant subsequent queries
+3. **Locale Handling**: Forces US English locale (`LC_ALL=en_US.UTF-8`) for consistent date parsing across systems
 4. **Smart Filtering**: Parses cache efficiently for lightning-fast date-based queries
+5. **Beautiful Display**: Formats output with headers, icons, and package counts for better readability
+
+---
+
+## 🎨 Output Formatting
+
+The function provides two types of output:
+
+### **Formatted Display** (default for package listings)
+- 📦 Section header with descriptive title
+- Clean underline separator
+- Package list with timestamps
+- 🔢 Total package count footer
+
+### **Statistics Mode** (count/per-day/per-week)
+- Plain text output for easy parsing
+- No formatting, just data
+- Perfect for scripting and analysis
 
 ---
 
@@ -161,7 +205,7 @@ rpm_installed --refresh
 
 - **Fish Shell** v3.0 or later
 - **RPM-based system** (Fedora, RHEL, CentOS, Rocky Linux, AlmaLinux, openSUSE, etc.)
-- Standard UNIX tools: `rpm`, `grep`, `sort`, `date`
+- Standard UNIX tools: `rpm`, `awk`, `date`
 
 ---
 
@@ -179,9 +223,22 @@ fish-rpm-installed/
 
 ---
 
+## 🆕 Recent Updates
+
+**v2.0** - Enhanced Visual Output
+- ✨ Added formatted headers with package icon (📦)
+- ✨ Added total package count footer with counter icon (🔢)
+- ✨ Clean underline separators for better readability
+- ✨ Applied formatting to all time period options
+- ✨ Maintained statistics mode for data analysis
+- ✨ Improved distro detection with clear error messages
+
+---
+
 ## 🔗 Related Projects
 
 - [bash-rpm-installed](https://github.com/fdel-ux64/bash-rpm-installed) - Bash shell version of this tool
+- [fish-config](https://github.com/fdel-ux64/fish-config) - Full Fish configuration with multiple utilities
 
 ---
 
@@ -204,7 +261,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 🙏 Acknowledgments
 
-Created for the Fish shell community and RPM-based distribution users who want better visibility into their system's package history.
+Created for the Fish shell community and RPM-based distribution users who want better visibility into their system's package history with a clean, modern interface.
 
 ---
 

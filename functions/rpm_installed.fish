@@ -120,6 +120,34 @@ function rpm_installed --description "List installed RPM packages by install dat
     set -l this_month_start (env LC_ALL=en_US.UTF-8 date -d (date +%Y-%m-01) +%s)
     set -l last_month_start (env LC_ALL=en_US.UTF-8 date -d (date +%Y-%m-01)' -1 month' +%s)
 
+    # ---- Helper function to display with formatting ----
+    function __display_packages
+        # First argument is the title, rest are the package lines
+        set -l title $argv[1]
+        set -l packages $argv[2..-1]
+        
+        # Count packages
+        set -l pkg_count (count $packages)
+        
+        # Display header if title provided
+        if test -n "$title"
+            echo -e "\n       📦 List of installed package(s): $title"
+            echo "       ╰─────────────────────────────────────────────────────────"
+            echo
+        end
+        
+        # Display packages
+        for pkg in $packages
+            echo $pkg
+        end
+        
+        # Display count if title provided
+        if test -n "$title"
+           echo -e "\n────────────────────────────────────"  
+           echo -e "🔢 Total number of package(s): $pkg_count\n"
+        end
+    end
+
     # ---- Execute with caching for since/until ----
     if test -n "$since_epoch"
         if test $count_mode -eq 1
@@ -129,10 +157,14 @@ function rpm_installed --description "List installed RPM packages by install dat
                 printf "%s\n" $__instlist_cache | awk -v s="$since_epoch" '{if($1>=s) count[strftime("%Y-%m-%d",$1)]++} END{for(d in count) printf "%s  %d\n", d, count[d]}' | sort
             end
         else
+            set -l custom_heading "since $(date -d @$since_epoch +%Y-%m-%d)"
             if test -n "$until_epoch"
-                printf "%s\n" $__instlist_cache | awk -v s="$since_epoch" -v e="$until_epoch" '$1>=s && $1<e' | sort -n
+                set custom_heading "$custom_heading until $(date -d @$until_epoch +%Y-%m-%d)"
+                set -l result (printf "%s\n" $__instlist_cache | awk -v s="$since_epoch" -v e="$until_epoch" '$1>=s && $1<e' | sort -n)
+                __display_packages "$custom_heading" $result
             else
-                printf "%s\n" $__instlist_cache | awk -v s="$since_epoch" '$1>=s' | sort -n
+                set -l result (printf "%s\n" $__instlist_cache | awk -v s="$since_epoch" '$1>=s' | sort -n)
+                __display_packages "$custom_heading" $result
             end
         end
         return
@@ -144,42 +176,48 @@ function rpm_installed --description "List installed RPM packages by install dat
             if test $count_mode -eq 1
                 printf "%s\n" $__instlist_cache | awk '{count[strftime("%Y-%m-%d",$1)]++} END{for(d in count) printf "%s  %d\n", d, count[d]}' | sort
             else
-                printf "%s\n" $__instlist_cache | sort -n
+                set -l result (printf "%s\n" $__instlist_cache | sort -n)
+                __display_packages "all time" $result
             end
 
         case today
             if test $count_mode -eq 1
                 printf "%s\n" $__instlist_cache | awk -v s="$today_start" -v e="$tomorrow_start" '$1>=s && $1<e {count[strftime("%Y-%m-%d",$1)]++} END{for(d in count) printf "%s  %d\n", d, count[d]}' | sort
             else
-                printf "%s\n" $__instlist_cache | awk -v s="$today_start" -v e="$tomorrow_start" '$1>=s && $1<e' | sort -n
+                set -l result (printf "%s\n" $__instlist_cache | awk -v s="$today_start" -v e="$tomorrow_start" '$1>=s && $1<e' | sort -n)
+                __display_packages "$heading" $result
             end
 
         case yesterday
             if test $count_mode -eq 1
                 printf "%s\n" $__instlist_cache | awk -v s="$yesterday_start" -v e="$today_start" '$1>=s && $1<e {count[strftime("%Y-%m-%d",$1)]++} END{for(d in count) printf "%s  %d\n", d, count[d]}' | sort
             else
-                printf "%s\n" $__instlist_cache | awk -v s="$yesterday_start" -v e="$today_start" '$1>=s && $1<e' | sort -n
+                set -l result (printf "%s\n" $__instlist_cache | awk -v s="$yesterday_start" -v e="$today_start" '$1>=s && $1<e' | sort -n)
+                __display_packages "$heading" $result
             end
 
         case last-week
             if test $count_mode -eq 1
                 printf "%s\n" $__instlist_cache | awk -v s="$last_week_start" '$1>=s {count[strftime("%Y-%m-%d",$1)]++} END{for(d in count) printf "%s  %d\n", d, count[d]}' | sort
             else
-                printf "%s\n" $__instlist_cache | awk -v s="$last_week_start" '$1>=s' | sort -n
+                set -l result (printf "%s\n" $__instlist_cache | awk -v s="$last_week_start" '$1>=s' | sort -n)
+                __display_packages "$heading" $result
             end
 
         case this-month
             if test $count_mode -eq 1
                 printf "%s\n" $__instlist_cache | awk -v s="$this_month_start" '$1>=s {count[strftime("%Y-%m-%d",$1)]++} END{for(d in count) printf "%s  %d\n", d, count[d]}' | sort
             else
-                printf "%s\n" $__instlist_cache | awk -v s="$this_month_start" '$1>=s' | sort -n
+                set -l result (printf "%s\n" $__instlist_cache | awk -v s="$this_month_start" '$1>=s' | sort -n)
+                __display_packages "$heading" $result
             end
 
         case last-month
             if test $count_mode -eq 1
                 printf "%s\n" $__instlist_cache | awk -v s="$last_month_start" -v e="$this_month_start" '$1>=s && $1<e {count[strftime("%Y-%m-%d",$1)]++} END{for(d in count) printf "%s  %d\n", d, count[d]}' | sort
             else
-                printf "%s\n" $__instlist_cache | awk -v s="$last_month_start" -v e="$this_month_start" '$1>=s && $1<e' | sort -n
+                set -l result (printf "%s\n" $__instlist_cache | awk -v s="$last_month_start" -v e="$this_month_start" '$1>=s && $1<e' | sort -n)
+                __display_packages "$heading" $result
             end
 
         case per-day
