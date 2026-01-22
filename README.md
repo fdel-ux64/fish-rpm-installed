@@ -75,7 +75,7 @@ rpm_installed per-day
 1768717504 (Sun 18 Jan 2026 07:25:04 AM CET): wireplumber-0.5.7-1.fc43.x86_64
 
 ────────────────────────────────────
-🔢 Total number of package(s): 21
+🔢 Total number of package(s): 3
 ```
 
 ---
