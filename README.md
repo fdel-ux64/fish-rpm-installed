@@ -225,6 +225,11 @@ fish-rpm-installed/
 
 ## 🆕 Recent Updates
 
+**v2.0.1** - Improved Error Handling and Help Output
+- ✨ Show full help on invalid arguments
+- ✨ Show full help when date parsing fails
+- ✨ More self-explanatory CLI behavior
+
 **v2.0** - Enhanced Visual Output
 - ✨ Added formatted headers with package icon (📦)
 - ✨ Added total package count footer with counter icon (🔢)
