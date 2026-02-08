@@ -238,6 +238,11 @@ fish-rpm-installed/
 - ✨ Maintained statistics mode for data analysis
 - ✨ Improved distro detection with clear error messages
 
+**v1.0.0 – Initial Release**
+- 🚀 Initial release of `rpm-installed` to list installed RPM packages by install date
+- 📦 Supports filtering by today, yesterday, last week, this month, last month
+- ⚙️ Includes count/stats mode and alias shortcuts (td, yd, lw, tm, lm)
+
 ---
 
 ## 🔗 Related Projects
