@@ -225,6 +225,11 @@ fish-rpm-installed/
 
 ## 🆕 Recent Updates
 
+**v2.0.2 – Case-Insensitive Arguments & Consistency**
+- ✨ Added case-insensitive argument handling (TODAY, today, Today all work)
+- 🔧 Normalized all command arguments and keywords (count, since, until)
+- 📝 Enhanced argument parsing for better user experience
+
 **v2.0.1** - Improved Error Handling and Help Output
 - ✨ Show full help on invalid arguments
 - ✨ Show full help when date parsing fails
