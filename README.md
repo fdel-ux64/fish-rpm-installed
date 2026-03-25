@@ -79,6 +79,16 @@ rpm_installed per-day
  🔢 Total number of package(s): 3
 ```
 
+**Output:**
+
+When the result contains more than 25 packages, the filter criteria is repeated in the footer alongside the total count, so context is preserved after scrolling:
+```
+ ────────────────────────────────────
+ 🔢 Total number of package(s): 111
+ ↑  Showing 111 package(s) installed: since 2026-03-17 until 2026-03-24
+```
+The threshold is controlled by the global variable `__rpm_summary_threshold` (default: `25`).
+
 ---
 
 ## 📖 Usage
@@ -230,6 +240,10 @@ fish-rpm-installed/
 ---
 
 ## 🆕 Changelog
+
+**v2.1.1 – Footer Summary for Long Lists**
+- ✨ Added filter criteria repeat in footer when package count exceeds 25 items
+- ⚙️ Threshold controlled by __rpm_summary_threshold variable (default: 25)
 
 **v2.1.0 – Bug Fixes**
 - 🐛 Fixed `until`-only queries being silently ignored (only worked when paired with `since`)
