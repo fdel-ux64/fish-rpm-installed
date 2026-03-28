@@ -5,16 +5,17 @@
 
 A Fish shell function to **list and analyze RPM packages** by installation date, with caching for fast repeated queries and formatted output.
 
-> 🚀 **Ever wondered what packages you installed last week?** Or need to audit recent system changes? This tool makes it effortless with a clean, formatted display.
+> 🚀 **Ever wondered what packages you installed last week?** Or need to audit recent system changes? This tool makes it effortless with a clean, date-grouped display.
 
 ---
 
 ## ✨ Features
 
 - **⚡ Fast** - Cached queries return results instantly after the first run
-- **📅 Date-Aware** - Filter packages by any date range or use convenient shortcuts
+- **📅 Date-Grouped** - Packages are grouped by installation date with per-group counts
 - **📊 Analytics** - Built-in aggregation to see installation patterns (per-day/per-week)
-- **🎨 Formatted Output** - Headers, icons, and package counts
+- **🎨 Formatted Output** - Date headers with icons, package counts, and footer summary
+- **🔀 Cache Control** - Enable, disable, or inspect the cache without restarting your shell
 - **🎯 Simple** - No additional dependencies beyond standard RPM system tools
 - **🔍 Smart** - Auto-detects RPM systems and uses consistent locale parsing
 
@@ -68,26 +69,30 @@ rpm_installed per-day
 ## 🎨 Example Output
 
 ```
-     📦 List of installed package(s): today
-    ╰─────────────────────────────────────────────────────────
-
- 2026-01-18 07:25:05: pipewire-pulseaudio-1.4.10-1.fc43.x86_64
- 2026-01-18 07:25:05: pipewire-plugin-libcamera-1.4.10-1.fc43.x86_64
- 2026-01-18 07:25:04: wireplumber-0.5.7-1.fc43.x86_64
-
+    📦 Installed packages — last-week
+ 📆 Wed 2026-03-18  (5 packages)
+    onnx-libs-1.17.0-12.fc43.x86_64
+    zlib-ng-2.3.3-2.fc43.x86_64
+    zlib-ng-compat-2.3.3-2.fc43.x86_64
+    zlib-ng-compat-devel-2.3.3-2.fc43.x86_64
+    perl-Module-CoreList-5.20260308-1.fc43.noarch
+ 📆 Thu 2026-03-19  (3 packages)
+    firefox-148.0.2-2.fc43.x86_64
+    firefox-langpacks-148.0.2-2.fc43.x86_64
+    libtasn1-4.21.0-1.fc43.x86_64
  ────────────────────────────────────
- 🔢 Total number of package(s): 3
+ 🔢 Total: 8 packages
 ```
 
-**Output:**
+When the result exceeds 100 packages, the filter criteria is repeated in the footer so context is preserved after scrolling:
 
-When the result contains more than 25 packages, the filter criteria is repeated in the footer alongside the total count, so context is preserved after scrolling:
 ```
  ────────────────────────────────────
- 🔢 Total number of package(s): 111
- ↑  Showing 111 package(s) installed: since 2026-03-17 until 2026-03-24
+ 🔢 Total: 111 packages
+ ↑  Showing 111 packages installed: last-month
 ```
-The threshold is controlled by the global variable `__rpm_summary_threshold` (default: `25`).
+
+The threshold is controlled by the global variable `__rpm_summary_threshold` (default: `100`).
 
 ---
 
@@ -100,6 +105,8 @@ rpm_installed [OPTION]
 rpm_installed count [OPTION]
 rpm_installed since DATE [until DATE]
 rpm_installed --refresh
+rpm_installed --cache on|off
+rpm_installed --cache
 rpm_installed --help
 ```
 
@@ -124,7 +131,10 @@ rpm_installed --help
 
 | Flag | Description |
 |------|-------------|
-| `--refresh` | Rebuild the cache from scratch |
+| `--refresh` | Clear and rebuild the cache on next call (caching stays enabled) |
+| `--cache on` | Enable caching (default) |
+| `--cache off` | Disable caching — RPM is queried live on every call |
+| `--cache` | Show current cache status (enabled/disabled, populated or empty) |
 | `--help` | Show usage information |
 
 ---
@@ -134,7 +144,7 @@ rpm_installed --help
 ### Simple Queries with Formatted Output
 
 ```fish
-# Using shortcuts - shows header, packages, and count
+# Using shortcuts - shows grouped output with date headers and count
 rpm_installed td                    # Today's installations
 rpm_installed yd                    # Yesterday's installations
 rpm_installed lw                    # Last week
@@ -182,23 +192,36 @@ rpm_installed per-week
 ### Cache Management
 
 ```fish
+# Check current cache status
+rpm_installed --cache
+# Cache: enabled (populated)
+
 # Refresh the cache after installing packages mid-session
 rpm_installed --refresh
+
+# Disable caching entirely — every call queries RPM live
+rpm_installed --cache off
+
+# Re-enable caching
+rpm_installed --cache on
 ```
 
 ---
 
 ## 🏗️ How It Works
 
-1. **First Run**: Queries all installed RPM packages with installation dates using `rpm -qa`
+1. **First Run**: Queries all installed RPM packages with installation timestamps using `rpm -qa`
 2. **Caching**: Stores results in a session-scoped variable (`__rpm_instlist_cache`) for fast subsequent queries
 3. **Locale Handling**: Forces US English locale (`LC_ALL=en_US.UTF-8`) for consistent date parsing across systems
 4. **Smart Filtering**: Parses the cache efficiently for date-based queries
-5. **Formatted Display**: Outputs headers, icons, and package counts for readability
+5. **Grouped Display**: Packages are grouped by installation date — date headers with per-group counts make long lists easy to scan
 
 ### ⚠️ Cache Behavior
 
-The cache is built once per shell session and held in memory. If you install or remove packages during a session, results will not reflect those changes until you run `rpm_installed --refresh`. This is intentional — automatic invalidation behavior may vary by distro in a future release.
+The cache is built once per shell session and held in memory. If you install or remove packages during a session, results will not reflect those changes until you run `rpm_installed --refresh`.
+
+`--refresh` clears the cache but keeps caching enabled — the cache rebuilds on the next call.
+`--cache off` disables caching entirely so every call queries RPM live. Use this when you need always-current results without manual refreshing.
 
 ---
 
@@ -207,10 +230,11 @@ The cache is built once per shell session and held in memory. If you install or 
 The function provides two types of output:
 
 ### **Formatted Display** (default for package listings)
-- 📦 Section header with descriptive title
-- Clean underline separator
-- Package list with timestamps
-- 🔢 Total package count footer
+- 📦 Section header with filter label
+- 📆 Date group headers with per-group package counts
+- Clean package name list under each date group
+- 🔢 Total package count footer with separator line
+- ↑ Filter reminder when total exceeds threshold (default: 100)
 
 ### **Statistics Mode** (count/per-day/per-week)
 - Plain text output for easy parsing
@@ -241,9 +265,18 @@ fish-rpm-installed/
 
 ## 🆕 Changelog
 
+**v2.5 – Grouped Output & Cache Control**
+- ✨ Packages now grouped by installation date with 📆 date headers and per-group counts
+- ✨ Redundant timestamp removed from each package line — cleaner, easier to scan
+- ✨ Added `--cache on/off` flag to enable or disable caching at runtime
+- ✨ Added `--cache` (no argument) to inspect current cache status
+- ✨ `--refresh` now explicitly distinct from `--cache off`: clears the cache but keeps caching enabled
+- ⚙️ Summary threshold raised from 25 to 100 (`__rpm_summary_threshold`)
+- 📝 Updated footer format: `🔢 Total: N packages`
+
 **v2.1.1 – Footer Summary for Long Lists**
-- ✨ Added filter criteria repeat in footer when package count exceeds 25 items
-- ⚙️ Threshold controlled by __rpm_summary_threshold variable (default: 25)
+- ✨ Added filter criteria repeat in footer when package count exceeds threshold
+- ⚙️ Threshold controlled by `__rpm_summary_threshold` variable (default: 25)
 
 **v2.1.0 – Bug Fixes**
 - 🐛 Fixed `until`-only queries being silently ignored (only worked when paired with `since`)
@@ -251,7 +284,7 @@ fish-rpm-installed/
 - 🐛 Fixed `last-week` and `this-month` having no upper time bound (future-dated packages could appear)
 - 🐛 Fixed `count per-day` and `count per-week` silently ignoring the `count` prefix
 - 🐛 Fixed alias shortcuts (e.g. `count td`) not resolving after `count` mode shift
-- 🐛 Fixed cache variable renamed to `__rpm_instlist_cache` to prevent collision when multiple distro variants of this tool are loaded in the same session
+- 🐛 Fixed cache variable renamed to `__rpm_instlist_cache` to prevent collision when multiple distro variants are loaded in the same session
 - 🐛 Fixed inner helper functions being redefined in global scope on every call
 - 🐛 Fixed missing bounds check when `since` or `until` is used without a following date argument
 
