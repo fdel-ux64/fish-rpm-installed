@@ -70,6 +70,7 @@ rpm_installed per-day
 
 ```
     📦 Installed packages — last-week
+
  📆 Wed 2026-03-18  (5 packages)
     onnx-libs-1.17.0-12.fc43.x86_64
     zlib-ng-2.3.3-2.fc43.x86_64
@@ -80,19 +81,20 @@ rpm_installed per-day
     firefox-148.0.2-2.fc43.x86_64
     firefox-langpacks-148.0.2-2.fc43.x86_64
     libtasn1-4.21.0-1.fc43.x86_64
+
  ────────────────────────────────────
  🔢 Total: 8 packages
 ```
 
-When the result exceeds 100 packages, the filter criteria is repeated in the footer so context is preserved after scrolling:
+When the result reaches or exceeds 75 packages, the filter criteria is repeated in the footer so context is preserved after scrolling:
 
 ```
  ────────────────────────────────────
- 🔢 Total: 111 packages
- ↑  Showing 111 packages installed: last-month
+ 🔢 Total: 83 packages
+ ↑  Showing 83 packages installed: last-month
 ```
 
-The threshold is controlled by the global variable `__rpm_summary_threshold` (default: `100`).
+The threshold is controlled by the global variable `__rpm_summary_threshold` (default: `75`).
 
 ---
 
