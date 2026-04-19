@@ -51,6 +51,9 @@ cp fish-rpm-installed/functions/rpm_installed.fish ~/.config/fish/functions/
 # What did I install today?
 rpm_installed today
 
+# Show packages from the last 3 days
+rpm_installed days 3
+
 # Show packages from last week
 rpm_installed last-week
 
@@ -83,18 +86,12 @@ rpm_installed per-day
     libtasn1-4.21.0-1.fc43.x86_64
 
  ────────────────────────────────────
- 🔢 Total: 8 packages
+ 🔢 Total: 8 packages — last-week
 ```
 
-When the result reaches or exceeds 75 packages, the filter criteria is repeated in the footer so context is preserved after scrolling:
+The filter label is always repeated in the footer, so context is preserved without having to scroll back up.
 
-```
- ────────────────────────────────────
- 🔢 Total: 83 packages
- ↑  Showing 83 packages installed: last-month
-```
-
-The threshold is controlled by the global variable `__rpm_summary_threshold` (default: `75`).
+When output exceeds the terminal height, the list is automatically paged with `less` — scroll freely, press `q` to exit. Paging is skipped when output is piped so scripting is unaffected.
 
 ---
 
@@ -104,6 +101,7 @@ The threshold is controlled by the global variable `__rpm_summary_threshold` (de
 
 ```fish
 rpm_installed [OPTION]
+rpm_installed days N
 rpm_installed count [OPTION]
 rpm_installed since DATE [until DATE]
 rpm_installed --refresh
@@ -118,6 +116,7 @@ rpm_installed --help
 |----------|-------|-------------|
 | `today` | `td` | Packages installed today |
 | `yesterday` | `yd` | Packages installed yesterday |
+| `days N` | | Last N days, rolling window (today included) |
 | `last-week` | `lw` | Last 7 days |
 | `this-month` | `tm` | Current calendar month |
 | `last-month` | `lm` | Previous calendar month |
@@ -150,9 +149,12 @@ rpm_installed --help
 rpm_installed td                    # Today's installations
 rpm_installed yd                    # Yesterday's installations
 rpm_installed lw                    # Last week
+rpm_installed days 3                # Last 3 days (rolling window, today included)
+rpm_installed days 14               # Last 14 days
 
 # With counts (no formatting, just statistics)
 rpm_installed count today           # How many packages today?
+rpm_installed count days 5          # How many packages in the last 5 days?
 rpm_installed count last-month      # Monthly installation count
 ```
 
@@ -235,8 +237,8 @@ The function provides two types of output:
 - 📦 Section header with filter label
 - 📆 Date group headers with per-group package counts
 - Clean package name list under each date group
-- 🔢 Total package count footer with separator line
-- ↑ Filter reminder when total exceeds threshold (default: 100)
+- 🔢 Total package count footer with filter label always repeated — visible without scrolling up
+- Auto-paged with `less` when output exceeds terminal height; skipped when piped
 
 ### **Statistics Mode** (count/per-day/per-week)
 - Plain text output for easy parsing
@@ -266,6 +268,14 @@ fish-rpm-installed/
 ---
 
 ## 🆕 Changelog
+
+**v3.0 – Auto-Pager & Days Range**
+- ✨ Added `days N` subcommand: rolling window from N days ago 00:00 through end of today
+- ✨ Works in count mode: `rpm_installed count days 5`
+- ✨ Auto-page with `less -R` when output exceeds terminal height — scroll freely, `q` to exit
+- ✨ Pager skipped when stdout is piped — scripting unaffected
+- ✨ Filter label now always shown in footer — context visible without scrolling up
+- 🗑️ Removed conditional threshold footer (`__rpm_summary_threshold`) — superseded by pager
 
 **v2.5 – Grouped Output & Cache Control**
 - ✨ Packages now grouped by installation date with 📆 date headers and per-group counts
