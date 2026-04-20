@@ -25,7 +25,7 @@ Perfect for system administrators, power users, and anyone managing RPM-based di
 
 ## 📦 Installation
 
-### Using [Fisher](https://github.com/jorgebucaran/fisher) (Recommended)
+### 🎣 Using [Fisher](https://github.com/jorgebucaran/fisher) (Recommended)
 
 ```fish
 fisher install fdel-ux64/fish-rpm-installed
@@ -87,6 +87,7 @@ rpm_installed per-day
 
  ────────────────────────────────────
  🔢 Total: 8 packages — last-week
+ 💾 Cache: session cache
 ```
 
 The filter label is always repeated in the footer, so context is preserved without having to scroll back up.
@@ -238,6 +239,7 @@ The function provides two types of output:
 - 📆 Date group headers with per-group package counts
 - Clean package name list under each date group
 - 🔢 Total package count footer with filter label always repeated — visible without scrolling up
+- 💾 Cache status shown in footer (`session cache` or `live query`)
 - Auto-paged with `less` when output exceeds terminal height; skipped when piped
 
 ### **Statistics Mode** (count/per-day/per-week)
@@ -268,6 +270,9 @@ fish-rpm-installed/
 ---
 
 ## 🆕 Changelog
+
+**v3.1 – Cache Status in Footer**
+- ✨ Cache status now shown in footer on every listing (`💾 Cache: session cache` or `live query`)
 
 **v3.0 – Auto-Pager & Days Range**
 - ✨ Added `days N` subcommand: rolling window from N days ago 00:00 through end of today
