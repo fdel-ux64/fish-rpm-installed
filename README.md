@@ -271,6 +271,10 @@ fish-rpm-installed/
 
 ## 🆕 Changelog
 
+**v3.2 – Future-Timestamp Warning & Bug Fixes**
+- ✨ Detect and warn on future-dated RPM INSTALLTIME entries (NTP clock correction during transaction)
+- 🐛 Fixed `count per-day` and `count per-week` erroring when prefixed with `count`
+
 **v3.1 – Cache Status in Footer**
 - ✨ Cache status now shown in footer on every listing (`💾 Cache: session cache` or `live query`)
 
@@ -334,6 +338,11 @@ fish-rpm-installed/
 
 - [bash-rpm-installed](https://github.com/fdel-ux64/bash-rpm-installed) - Bash shell version of this tool — keep versions in sync, both share the same fix history
 - [fish-config](https://github.com/fdel-ux64/fish-config) - Full Fish configuration with multiple utilities
+
+## 🛠️ Development
+
+This function is developed as part of [fish-config](https://github.com/fdel-ux64/fish-config).
+Feature requests and issues are tracked there.
 
 ---
 
