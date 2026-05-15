@@ -18,6 +18,7 @@ A Fish shell function to **list and analyze RPM packages** by installation date,
 - **🔀 Cache Control** - Enable, disable, or inspect the cache without restarting your shell
 - **🎯 Simple** - No additional dependencies beyond standard RPM system tools
 - **🔍 Smart** - Auto-detects RPM systems and uses consistent locale parsing
+- **🔎 Package Search** - Look up the full install history of any package by exact name or glob pattern (`'kern*'`, `'*lib*'`)
 
 Perfect for system administrators, power users, and anyone managing RPM-based distributions like **Fedora**, **RHEL**, **CentOS**, **Rocky Linux**, **AlmaLinux**, and **openSUSE**.
 
@@ -65,6 +66,12 @@ rpm_installed since 2025-01-01 until 2025-01-10
 
 # See installation patterns
 rpm_installed per-day
+
+# Look up a package's full install history
+rpm_installed package cups
+
+# Look up all kernel packages (glob — always quote the pattern)
+rpm_installed package 'kern*'
 ```
 
 ---
@@ -94,6 +101,30 @@ The filter label is always repeated in the footer, so context is preserved witho
 
 When output exceeds the terminal height, the list is automatically paged with `less` — scroll freely, press `q` to exit. Paging is skipped when output is piped so scripting is unaffected.
 
+### Package Search Output
+
+```
+    📦 Package history — kern*
+
+ 📆 Sat 2026-05-09  (5 packages)
+    09:30 CEST  kernel-core-7.0.4-200.fc44.x86_64
+    09:30 CEST  kernel-modules-core-7.0.4-200.fc44.x86_64
+    09:30 CEST  kernel-modules-7.0.4-200.fc44.x86_64
+    09:30 CEST  kernel-modules-extra-7.0.4-200.fc44.x86_64
+    09:30 CEST  kernel-7.0.4-200.fc44.x86_64
+ 📆 Thu 2026-05-14  (6 packages)
+    10:50 CEST  kernel-core-7.0.6-200.fc44.x86_64
+    10:50 CEST  kernel-modules-7.0.6-200.fc44.x86_64
+    10:50 CEST  kernel-7.0.6-200.fc44.x86_64
+    ...
+
+ ────────────────────────────────────
+ 🔢 11 install records matching 'kern*'
+ 💾 Cache: session cache
+```
+
+Package search groups results by date and shows install time to the minute. All kernel update cycles are visible at a glance.
+
 ---
 
 ## 📖 Usage
@@ -105,6 +136,8 @@ rpm_installed [OPTION]
 rpm_installed days N
 rpm_installed count [OPTION]
 rpm_installed since DATE [until DATE]
+rpm_installed package NAME
+rpm_installed package 'PATTERN'
 rpm_installed --refresh
 rpm_installed --cache on|off
 rpm_installed --cache
@@ -113,31 +146,40 @@ rpm_installed --help
 
 ### Time-Based Shortcuts
 
-| Shortcut | Alias | Description |
-|----------|-------|-------------|
-| `today` | `td` | Packages installed today |
-| `yesterday` | `yd` | Packages installed yesterday |
-| `days N` | | Last N days, rolling window (today included) |
-| `last-week` | `lw` | Last 7 days |
-| `this-month` | `tm` | Current calendar month |
-| `last-month` | `lm` | Previous calendar month |
+| Shortcut     | Alias | Description                                  |
+| ------------ | ----- | -------------------------------------------- |
+| `today`      | `td`  | Packages installed today                     |
+| `yesterday`  | `yd`  | Packages installed yesterday                 |
+| `days N`     |       | Last N days, rolling window (today included) |
+| `last-week`  | `lw`  | Last 7 days                                  |
+| `this-month` | `tm`  | Current calendar month                       |
+| `last-month` | `lm`  | Previous calendar month                      |
+
+### Package Search
+
+| Syntax              | Description                                                |
+| ------------------- | ---------------------------------------------------------- |
+| `package NAME`      | Full install history for an exact package name             |
+| `package 'PATTERN'` | Full install history with glob — e.g. `'kern*'`, `'*lib*'` |
+
+> ⚠️ **Always quote glob patterns** containing `*` — without quotes, Fish expands them as filesystem globs before the function sees them. Exact names (`cups`) need no quotes.
 
 ### Analytics Options
 
-| Option | Description |
-|--------|-------------|
-| `per-day` | Count packages grouped by day |
+| Option     | Description                    |
+| ---------- | ------------------------------ |
+| `per-day`  | Count packages grouped by day  |
 | `per-week` | Count packages grouped by week |
 
 ### Special Flags
 
-| Flag | Description |
-|------|-------------|
-| `--refresh` | Clear and rebuild the cache on next call (caching stays enabled) |
-| `--cache on` | Enable caching (default) |
-| `--cache off` | Disable caching — RPM is queried live on every call |
-| `--cache` | Show current cache status (enabled/disabled, populated or empty) |
-| `--help` | Show usage information |
+| Flag          | Description                                                      |
+| ------------- | ---------------------------------------------------------------- |
+| `--refresh`   | Clear and rebuild the cache on next call (caching stays enabled) |
+| `--cache on`  | Enable caching (default)                                         |
+| `--cache off` | Disable caching — RPM is queried live on every call              |
+| `--cache`     | Show current cache status (enabled/disabled, populated or empty) |
+| `--help`      | Show usage information                                           |
 
 ---
 
@@ -211,6 +253,19 @@ rpm_installed --cache off
 rpm_installed --cache on
 ```
 
+### Package Search
+
+```fish
+# Exact name — no quotes needed
+rpm_installed package cups
+rpm_installed package firefox
+
+# Glob pattern — always quote to prevent shell expansion
+rpm_installed package 'kern*'       # all kernel packages
+rpm_installed package 'python3*'    # all python3 packages
+rpm_installed package '*lib*'       # anything with 'lib' in the name
+```
+
 ---
 
 ## 🏗️ How It Works
@@ -235,6 +290,7 @@ The cache is built once per shell session and held in memory. If you install or 
 The function provides two types of output:
 
 ### **Formatted Display** (default for package listings)
+
 - 📦 Section header with filter label
 - 📆 Date group headers with per-group package counts
 - Clean package name list under each date group
@@ -242,7 +298,14 @@ The function provides two types of output:
 - 💾 Cache status shown in footer (`session cache` or `live query`)
 - Auto-paged with `less` when output exceeds terminal height; skipped when piped
 
+### **Package Search Display** (`package NAME` / `package 'PATTERN'`)
+
+- Same date-grouped layout as above
+- Install time shown to the minute (e.g. `05:30 CEST`) — useful for spotting batch updates
+- Footer shows match count and the pattern used
+
 ### **Statistics Mode** (count/per-day/per-week)
+
 - Plain text output for easy parsing
 - No formatting, just data
 - Perfect for scripting and analysis
@@ -271,14 +334,24 @@ fish-rpm-installed/
 
 ## 🆕 Changelog
 
+**v3.3 – Package Search**
+
+- ✨ Added `package NAME` subcommand: full install history for an exact package name
+- ✨ Added glob support: `package 'PATTERN'` matches with `*`, `?`, `[...]` (e.g. `'kern*'`, `'*lib*'`)
+- ✨ Package search output shows install time to the minute, grouped by date
+- 📝 Requested on r/fedora by a Bazzite user
+
 **v3.2 – Future-Timestamp Warning & Bug Fixes**
+
 - ✨ Detect and warn on future-dated RPM INSTALLTIME entries (NTP clock correction during transaction)
 - 🐛 Fixed `count per-day` and `count per-week` erroring when prefixed with `count`
 
 **v3.1 – Cache Status in Footer**
+
 - ✨ Cache status now shown in footer on every listing (`💾 Cache: session cache` or `live query`)
 
 **v3.0 – Auto-Pager & Days Range**
+
 - ✨ Added `days N` subcommand: rolling window from N days ago 00:00 through end of today
 - ✨ Works in count mode: `rpm_installed count days 5`
 - ✨ Auto-page with `less -R` when output exceeds terminal height — scroll freely, `q` to exit
@@ -287,6 +360,7 @@ fish-rpm-installed/
 - 🗑️ Removed conditional threshold footer (`__rpm_summary_threshold`) — superseded by pager
 
 **v2.5 – Grouped Output & Cache Control**
+
 - ✨ Packages now grouped by installation date with 📆 date headers and per-group counts
 - ✨ Redundant timestamp removed from each package line — cleaner, easier to scan
 - ✨ Added `--cache on/off` flag to enable or disable caching at runtime
@@ -296,10 +370,12 @@ fish-rpm-installed/
 - 📝 Updated footer format: `🔢 Total: N packages`
 
 **v2.1.1 – Footer Summary for Long Lists**
+
 - ✨ Added filter criteria repeat in footer when package count exceeds threshold
 - ⚙️ Threshold controlled by `__rpm_summary_threshold` variable (default: 25)
 
 **v2.1.0 – Bug Fixes**
+
 - 🐛 Fixed `until`-only queries being silently ignored (only worked when paired with `since`)
 - 🐛 Fixed `until DATE` off-by-one: specified date is now inclusive
 - 🐛 Fixed `last-week` and `this-month` having no upper time bound (future-dated packages could appear)
@@ -310,16 +386,19 @@ fish-rpm-installed/
 - 🐛 Fixed missing bounds check when `since` or `until` is used without a following date argument
 
 **v2.0.2 – Case-Insensitive Arguments & Consistency**
+
 - ✨ Added case-insensitive argument handling (TODAY, today, Today all work)
 - 🔧 Normalized all command arguments and keywords (count, since, until)
 - 📝 Enhanced argument parsing for better user experience
 
 **v2.0.1 – Improved Error Handling and Help Output**
+
 - ✨ Show full help on invalid arguments
 - ✨ Show full help when date parsing fails
 - ✨ More self-explanatory CLI behavior
 
 **v2.0 – Enhanced Visual Output**
+
 - ✨ Added formatted headers with package icon (📦)
 - ✨ Added total package count footer with counter icon (🔢)
 - ✨ Clean underline separators for better readability
@@ -328,6 +407,7 @@ fish-rpm-installed/
 - ✨ Improved distro detection with clear error messages
 
 **v1.0.0 – Initial Release**
+
 - 🚀 Initial release of `rpm-installed` to list installed RPM packages by install date
 - 📦 Supports filtering by today, yesterday, last week, this month, last month
 - ⚙️ Includes count/stats mode and alias shortcuts (td, yd, lw, tm, lm)
@@ -380,6 +460,7 @@ Created for the Fish shell community and RPM-based distribution users who want b
 ## ⭐ Show Your Support
 
 If you find this useful, please consider:
+
 - ⭐ Starring this repository
 - 🐛 Reporting issues you encounter
 - 📢 Sharing it with others who might benefit
