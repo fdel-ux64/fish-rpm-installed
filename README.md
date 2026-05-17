@@ -64,6 +64,9 @@ rpm_installed count this-month
 # Custom date range
 rpm_installed since 2025-01-01 until 2025-01-10
 
+# Exact single date
+rpm_installed on 2026-05-15
+
 # See installation patterns
 rpm_installed per-day
 
@@ -134,6 +137,7 @@ Package search groups results by date and shows install time to the minute. All 
 ```fish
 rpm_installed [OPTION]
 rpm_installed days N
+rpm_installed on DATE
 rpm_installed count [OPTION]
 rpm_installed since DATE [until DATE]
 rpm_installed package NAME
@@ -151,6 +155,7 @@ rpm_installed --help
 | `today`      | `td`  | Packages installed today                     |
 | `yesterday`  | `yd`  | Packages installed yesterday                 |
 | `days N`     |       | Last N days, rolling window (today included) |
+| `on DATE`    |       | Exact single date — e.g. `on 2026-05-15`     |
 | `last-week`  | `lw`  | Last 7 days                                  |
 | `this-month` | `tm`  | Current calendar month                       |
 | `last-month` | `lm`  | Previous calendar month                      |
@@ -213,7 +218,13 @@ rpm_installed since 2025-01-01
 # until-only (everything up to a date)
 rpm_installed until 2025-06-01
 
-# A single specific day (until is inclusive of the specified date)
+# Exact single date — cleaner than since X until X
+rpm_installed on 2026-05-15
+
+# Count packages on a specific date
+rpm_installed count on 2026-05-15
+
+# A single specific day using since/until (equivalent to 'on')
 rpm_installed since 2025-12-25 until 2025-12-25
 ```
 
@@ -333,6 +344,12 @@ fish-rpm-installed/
 ---
 
 ## 🆕 Changelog
+
+**v3.4 – on DATE subcommand & heading fix**
+
+- ✨ Added `on DATE` subcommand: exact single-date query — cleaner than `since DATE until DATE`
+- ✨ Works in count mode: `count on DATE`
+- 🐛 Fixed `since X until X` footer heading showing the next day (e.g. `until 2026-05-16` when `until 2026-05-15` was typed)
 
 **v3.3 – Package Search**
 
