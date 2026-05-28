@@ -67,6 +67,9 @@ rpm_installed since 2025-01-01 until 2025-01-10
 # Exact single date
 rpm_installed on 2026-05-15
 
+# Packages installed this calendar week
+rpm_installed this-week
+
 # See installation patterns
 rpm_installed per-day
 
@@ -138,6 +141,7 @@ Package search groups results by date and shows install time to the minute. All 
 rpm_installed [OPTION]
 rpm_installed days N
 rpm_installed on DATE
+rpm_installed this-week
 rpm_installed count [OPTION]
 rpm_installed since DATE [until DATE]
 rpm_installed package NAME
@@ -156,6 +160,7 @@ rpm_installed --help
 | `yesterday`  | `yd`  | Packages installed yesterday                 |
 | `days N`     |       | Last N days, rolling window (today included) |
 | `on DATE`    |       | Exact single date — e.g. `on 2026-05-15`     |
+| `this-week`  | `tw`  | This calendar week, Mon → today              |
 | `last-week`  | `lw`  | Last 7 days                                  |
 | `this-month` | `tm`  | Current calendar month                       |
 | `last-month` | `lm`  | Previous calendar month                      |
@@ -196,12 +201,14 @@ rpm_installed --help
 # Using shortcuts - shows grouped output with date headers and count
 rpm_installed td                    # Today's installations
 rpm_installed yd                    # Yesterday's installations
+rpm_installed tw                    # This calendar week (Mon → today)
 rpm_installed lw                    # Last week
 rpm_installed days 3                # Last 3 days (rolling window, today included)
 rpm_installed days 14               # Last 14 days
 
 # With counts (no formatting, just statistics)
 rpm_installed count today           # How many packages today?
+rpm_installed count this-week       # How many packages this week?
 rpm_installed count days 5          # How many packages in the last 5 days?
 rpm_installed count last-month      # Monthly installation count
 ```
@@ -344,6 +351,12 @@ fish-rpm-installed/
 ---
 
 ## 🆕 Changelog
+
+**v3.5 – this-week subcommand**
+
+- ✨ Added `this-week` (alias `tw`): ISO calendar week from Monday 00:00 through end of today
+- ✨ Heading shows explicit date range: `Mon 2026-05-25 → Thu 2026-05-28`
+- ✨ Works in count mode: `count this-week`
 
 **v3.4 – on DATE subcommand & heading fix**
 
