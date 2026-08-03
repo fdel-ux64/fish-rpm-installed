@@ -19,6 +19,7 @@ A Fish shell function to **list and analyze RPM packages** by installation date,
 - **🎯 Simple** - No additional dependencies beyond standard RPM system tools
 - **🔍 Smart** - Auto-detects RPM systems and uses consistent locale parsing
 - **🔎 Package Search** - Look up the full install history of any package by exact name or glob pattern (`'kern*'`, `'*lib*'`)
+- **🕐 Time Display** - Add `--time`/`-t` to any date-based query to show install time (HH:MM) next to each package
 
 Perfect for system administrators, power users, and anyone managing RPM-based distributions like **Fedora**, **RHEL**, **CentOS**, **Rocky Linux**, **AlmaLinux**, and **openSUSE**.
 
@@ -146,6 +147,7 @@ rpm_installed count [OPTION]
 rpm_installed since DATE [until DATE]
 rpm_installed package NAME
 rpm_installed package 'PATTERN'
+rpm_installed --time | -t     # add to any date-based query, any position
 rpm_installed --refresh
 rpm_installed --cache on|off
 rpm_installed --cache
@@ -173,6 +175,20 @@ rpm_installed --help
 | `package 'PATTERN'` | Full install history with glob — e.g. `'kern*'`, `'*lib*'` |
 
 > ⚠️ **Always quote glob patterns** containing `*` — without quotes, Fish expands them as filesystem globs before the function sees them. Exact names (`cups`) need no quotes.
+
+### Time Display
+
+| Flag         | Description                                                          |
+| ------------ | --------------------------------------------------------------------- |
+| `--time`/`-t` | Show install time (HH:MM) next to each package, on any date-based query |
+
+Can be placed anywhere in the arguments:
+
+```fish
+rpm_installed today --time
+rpm_installed -t days 3
+rpm_installed since 2026-07-01 --time
+```
 
 ### Analytics Options
 
@@ -205,6 +221,8 @@ rpm_installed tw                    # This calendar week (Mon → today)
 rpm_installed lw                    # Last week
 rpm_installed days 3                # Last 3 days (rolling window, today included)
 rpm_installed days 14               # Last 14 days
+rpm_installed today --time          # Today's installations, with install time (HH:MM)
+rpm_installed -t days 3             # Last 3 days, with install time
 
 # With counts (no formatting, just statistics)
 rpm_installed count today           # How many packages today?
@@ -351,6 +369,11 @@ fish-rpm-installed/
 ---
 
 ## 🆕 Changelog
+
+**v3.6 – Time Display**
+
+- ✨ Added `--time`/`-t` flag: shows install time (HH:MM) next to each package on any date-based query
+- ✨ Flag can be placed anywhere in the arguments (e.g. `rpm_installed today --time`, `rpm_installed -t days 3`)
 
 **v3.5 – this-week subcommand**
 
