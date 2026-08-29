@@ -76,7 +76,7 @@ rpm_installed package 'kern*'
 ## Example Output
 
 ```
-    📦 Installed packages — last-week
+    📦 Installed packages — last 7 days (rolling, today excluded)
 
  📆 Wed 2026-03-18  (5 packages)
     onnx-libs-1.17.0-12.fc43.x86_64
@@ -90,7 +90,7 @@ rpm_installed package 'kern*'
     libtasn1-4.21.0-1.fc43.x86_64
 
  ────────────────────────────────────
- 🔢 Total: 8 packages — last-week
+ 🔢 Total: 8 packages — last 7 days (rolling, today excluded)
  💾 Cache: session cache
 ```
 
@@ -359,6 +359,12 @@ fish-rpm-installed/
 ---
 
 ## Changelog
+
+**v3.7 – Descriptive Period Headers**
+
+- Section headers now spell out what each period actually means instead of showing the raw flag: `today` → "today (since midnight)", `last-week` → "last 7 days (rolling, today excluded)", etc.
+- Applies to `today`, `yesterday`, `last-week`, `this-month`, `last-month`
+- `this-week`, `days N`, `on DATE`, and `since`/`until` headings are unchanged, they already show explicit date ranges
 
 **v3.6 – Time Display**
 
