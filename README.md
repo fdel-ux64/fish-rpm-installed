@@ -58,6 +58,10 @@ rpm_installed since 2025-01-01 until 2025-01-10
 # Exact single date
 rpm_installed on 2026-05-15
 
+# A specific month
+rpm_installed month 2026-06
+rpm_installed month june 2026
+
 # Packages installed this calendar week
 rpm_installed this-week
 
@@ -132,6 +136,8 @@ Package search groups results by date and shows install time to the minute. All 
 rpm_installed [OPTION]
 rpm_installed days N
 rpm_installed on DATE
+rpm_installed month YYYY-MM
+rpm_installed month NAME YEAR
 rpm_installed this-week
 rpm_installed count [OPTION]
 rpm_installed since DATE [until DATE]
@@ -156,6 +162,7 @@ rpm_installed --help
 | `last-week`  | `lw`  | Last 7 days                                  |
 | `this-month` | `tm`  | Current calendar month                       |
 | `last-month` | `lm`  | Previous calendar month                      |
+| `month YYYY-MM` / `month NAME YEAR` | | A specific month — e.g. `month 2026-06` or `month june 2026` |
 
 ### Package Search
 
@@ -241,6 +248,17 @@ rpm_installed count on 2026-05-15
 
 # A single specific day using since/until (equivalent to 'on')
 rpm_installed since 2025-12-25 until 2025-12-25
+
+# A specific month, YYYY-MM form
+rpm_installed month 2026-06
+
+# A specific month, month name + year form (case-insensitive, abbreviations work)
+rpm_installed month june 2026
+rpm_installed month JUNE 2026
+rpm_installed month jun 2026
+
+# Count packages in a specific month
+rpm_installed count month 2026-06
 ```
 
 ### Analytics (Statistics Only)
@@ -359,6 +377,14 @@ fish-rpm-installed/
 ---
 
 ## Changelog
+
+**v3.8 – Month Subcommand**
+
+- Added `month` subcommand: retrieve installed packages for any specific calendar month, not just `this-month` or `last-month`
+- Accepts two input forms: `month YYYY-MM` (e.g. `month 2026-06`) or `month NAME YEAR` (e.g. `month june 2026`)
+- Month name form is case-insensitive and accepts abbreviations (`jun`, `june`, `JUNE`), parsed via GNU `date`
+- Works in count mode: `rpm_installed count month 2026-06`
+- Heading shows the full month name and year, e.g. "June 2026"
 
 **v3.7 – Descriptive Period Headers**
 
