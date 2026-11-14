@@ -9,7 +9,7 @@ A Fish shell function to list and analyze RPM packages by installation date, wit
 
 ## Features
 
-Queries are cached in the current shell session, so repeated calls after the first run are instant. Packages are grouped by installation date with per-group counts, and there's built-in aggregation for installation patterns (per-day/per-week). Cache can be enabled, disabled, or inspected without restarting the shell. Package search looks up the full install history of any package by exact name or glob pattern (`'kern*'`, `'*lib*'`), and `--time`/`-t` adds install time (HH:MM) next to each package on any date-based query.
+Queries are cached in the current shell session, so repeated calls after the first run are instant. Packages are grouped by installation date with per-group counts, and there's built-in aggregation for installation patterns (per-day/per-week). Cache can be enabled, disabled, or inspected without restarting the shell. Package search looks up the full install history of any package by exact name or glob pattern (`'kern*'`, `'*lib*'`), and `--time`/`-t` adds install time (HH:MM) next to each package on any date-based query. `--reverse`/`-r` shows newest first, and `last N` lists the N most recently installed packages regardless of date.
 
 No additional dependencies beyond standard RPM system tools. Useful for Fedora, RHEL, CentOS, Rocky Linux, AlmaLinux, openSUSE, and other RPM-based distributions.
 
@@ -73,6 +73,12 @@ rpm_installed package cups
 
 # Look up all kernel packages (glob — always quote the pattern)
 rpm_installed package 'kern*'
+
+# The 10 most recently installed packages, any date
+rpm_installed last 10
+
+# Last 7 days, newest first
+rpm_installed days 7 --reverse
 ```
 
 ---
@@ -141,9 +147,11 @@ rpm_installed month NAME YEAR
 rpm_installed this-week
 rpm_installed count [OPTION]
 rpm_installed since DATE [until DATE]
+rpm_installed last N
 rpm_installed package NAME
 rpm_installed package 'PATTERN'
 rpm_installed --time | -t     # add to any date-based query, any position
+rpm_installed --reverse | -r  # newest first, any position
 rpm_installed --refresh
 rpm_installed --cache on|off
 rpm_installed --cache
@@ -163,6 +171,7 @@ rpm_installed --help
 | `this-month` | `tm`  | Current calendar month                       |
 | `last-month` | `lm`  | Previous calendar month                      |
 | `month YYYY-MM` / `month NAME YEAR` | | A specific month — e.g. `month 2026-06` or `month june 2026` |
+| `last N`     |       | The N most recently installed packages, any date |
 
 ### Package Search
 
@@ -185,6 +194,19 @@ Can be placed anywhere in the arguments:
 rpm_installed today --time
 rpm_installed -t days 3
 rpm_installed since 2026-07-01 --time
+```
+
+### Order
+
+| Flag             | Description                                                                     |
+| ---------------- | ------------------------------------------------------------------------------- |
+| `--reverse`/`-r` | Show newest first, on date queries, `last N`, `package` search and count output |
+
+Can be placed anywhere in the arguments. `last N` can be combined with `since`/`until` to get the N newest within a range. It cannot be combined with `count`.
+
+```fish
+rpm_installed days 7 --reverse
+rpm_installed -r last 10
 ```
 
 ### Analytics Options
@@ -259,6 +281,17 @@ rpm_installed month jun 2026
 
 # Count packages in a specific month
 rpm_installed count month 2026-06
+```
+
+### Most Recent and Reverse Order
+
+```fish
+rpm_installed last 10                     # the 10 most recently installed packages
+rpm_installed last 10 --reverse           # same, newest first
+rpm_installed last 10 since 2026-11-01    # the 10 newest within a range
+rpm_installed days 7 -r                   # last 7 days, newest first
+rpm_installed package 'kern*' -r          # kernel history, newest first
+rpm_installed count per-day -r            # per-day counts, newest first
 ```
 
 ### Analytics (Statistics Only)
@@ -377,6 +410,12 @@ fish-rpm-installed/
 ---
 
 ## Changelog
+
+**v3.9 – Reverse Order and last N**
+
+- Added `--reverse`/`-r` flag: show newest first. Works with date queries, `last N`, `package` search and count output. Can be placed anywhere in the arguments
+- Added `last N` subcommand: the N most recently installed packages regardless of date. Combine with `since`/`until` for the N newest within a range. Cannot be combined with `count`
+- Fixed `package` search mis-reading names that contain a hyphen followed by a digit, such as `java-21-openjdk`
 
 **v3.8 – Month Subcommand**
 
